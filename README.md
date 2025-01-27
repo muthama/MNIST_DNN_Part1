@@ -21,10 +21,7 @@ The repository also includes the necessary file structure to organize the MNIST 
 ## File Structure
 ```
 MNIST_DNN_Part1/
-├── src/                 # Source code for the project
-│   ├── main.cpp         # Main program file
-│   ├── neural_net.cpp   # Neural network implementation
-│   └── neural_net.h     # Header file for the neural network
+├── mnist_dnn.cpp    # Main program file
 ├── data/                # Directory for MNIST dataset files
 │   ├── train-images-idx3-ubyte
 │   ├── train-labels-idx1-ubyte
