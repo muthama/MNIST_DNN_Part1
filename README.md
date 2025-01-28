@@ -44,6 +44,56 @@ The training loop iterates through a configured number of epochs, processing the
 
 ---
 
+## Experimental Results and Analysis
+
+The network was trained for 10 epochs, demonstrating impressive performance improvements over the training period. Here are the detailed results and their interpretation:
+
+### Performance Metrics
+
+```
+Epoch 1 - Training Accuracy: 86.7133%, Loss (not real CE): 7972
+         Test Accuracy: 92.16%
+Epoch 2 - Training Accuracy: 93.815%, Loss (not real CE): 3711
+         Test Accuracy: 94.43%
+Epoch 3 - Training Accuracy: 95.5367%, Loss (not real CE): 2678
+         Test Accuracy: 95.38%
+Epoch 4 - Training Accuracy: 96.4367%, Loss (not real CE): 2138
+         Test Accuracy: 96.1%
+Epoch 5 - Training Accuracy: 97.055%, Loss (not real CE): 1767
+         Test Accuracy: 96.64%
+Epoch 6 - Training Accuracy: 97.4767%, Loss (not real CE): 1514
+         Test Accuracy: 96.93%
+Epoch 7 - Training Accuracy: 97.8667%, Loss (not real CE): 1280
+         Test Accuracy: 97.08%
+Epoch 8 - Training Accuracy: 98.1333%, Loss (not real CE): 1120
+         Test Accuracy: 97.21%
+Epoch 9 - Training Accuracy: 98.37%, Loss (not real CE): 978
+         Test Accuracy: 97.25%
+Epoch 10 - Training Accuracy: 98.615%, Loss (not real CE): 831
+         Test Accuracy: 97.16%
+```
+
+### Analysis of Results
+
+#### Training Accuracy
+The network demonstrates strong learning capabilities, with training accuracy improving from 86.7% to 98.6% over ten epochs. This substantial improvement indicates that the network successfully learns to recognize patterns in the training data. The steady increase in accuracy, rather than sudden jumps, suggests stable and consistent learning throughout the training process.
+
+#### Loss Metric
+The loss value, while not implementing traditional cross-entropy, serves as a practical measure of model performance. It represents the count of misclassifications during training, decreasing significantly from 7,972 to 831 over the training period. This dramatic reduction in classification errors aligns with the observed improvement in accuracy and confirms the network's learning progression.
+
+#### Test Accuracy
+Perhaps the most significant indicator of the model's true performance is its test accuracy, which improves from 92.16% to 97.16%. This metric is particularly important as it represents the network's ability to generalize to unseen data. The test accuracy's steady increase, nearly matching the training accuracy's trajectory, indicates that the network is learning meaningful features rather than merely memorizing the training data.
+
+The final test accuracy of 97.16% is particularly impressive for a vanilla neural network implementation, approaching the performance levels of more complex architectures while maintaining simplicity in design and implementation.
+
+### Learning Dynamics
+The results reveal several interesting aspects of the network's learning process:
+1. The most dramatic improvements occur in the early epochs, with the first two epochs showing the largest accuracy gains.
+2. The learning curve begins to plateau around epoch 8, suggesting the network is approaching its optimal performance for the current architecture.
+3. The small gap between training and test accuracy (approximately 1.5%) indicates good generalization without significant overfitting.
+
+---
+
 ## File Structure
 ```
 MNIST_DNN_Part1/
