@@ -18,21 +18,23 @@
 #include <cstdlib>    // For std::rand(), std::srand()
 #include <cstring>    // For string operations (optional)
 #include <algorithm>  // For std::max_element, etc.
+#include <chrono>     // For timing measurements
+#include <iomanip>    // For output formatting
 
 // ----------------------------- Configuration -------------------------------- //
-static const int IMAGE_SIZE = 28;       // Each MNIST image is 28 x 28
-static const int INPUT_SIZE = 28 * 28;  // Flattened input dimension: 784
-static const int NUM_CLASSES = 10;      // Number of digit classes (0 through 9)
+static const int IMAGE_SIZE = 28; // Each MNIST image is 28 x 28
+static const int INPUT_SIZE = 28 * 28; // Flattened input dimension: 784
+static const int NUM_CLASSES = 10; // Number of digit classes (0 through 9)
 
 // Simple network architecture for demonstration: 784 -> 128 -> 64 -> 10
 static const int HIDDEN1 = 128;
 static const int HIDDEN2 = 64;
 
 // Hyperparameters for training
-static const float LEARNING_RATE = 0.001f;  // How fast the network updates weights
-static const int EPOCHS = 10;               // Number of training epochs
-static const int TRAINING_SAMPLES = 60000;  // Number of images in full MNIST training set
-static const int TEST_SAMPLES = 10000;      // Number of images in full MNIST test set
+static const float LEARNING_RATE = 0.001f; // How fast the network updates weights
+static const int EPOCHS = 10; // Number of training epochs
+static const int TRAINING_SAMPLES = 60000; // Number of images in full MNIST training set
+static const int TEST_SAMPLES = 10000; // Number of images in full MNIST test set
 
 // --------------------- MNIST Reading Utilities ------------------------------ //
 /**
@@ -43,11 +45,11 @@ static const int TEST_SAMPLES = 10000;      // Number of images in full MNIST te
  */
 int reverseInt(int i) {
     unsigned char c1, c2, c3, c4;
-    c1 = i & 255;         // lowest byte
-    c2 = (i >> 8) & 255;  // 2nd byte
+    c1 = i & 255; // lowest byte
+    c2 = (i >> 8) & 255; // 2nd byte
     c3 = (i >> 16) & 255; // 3rd byte
     c4 = (i >> 24) & 255; // highest byte
-    return ((int)c1 << 24) + ((int)c2 << 16) + ((int)c3 << 8) + c4;
+    return ((int) c1 << 24) + ((int) c2 << 16) + ((int) c3 << 8) + c4;
 }
 
 /**
@@ -60,8 +62,7 @@ int reverseInt(int i) {
  */
 bool readMNISTImages(const std::string &filename,
                      std::vector<std::vector<float> > &images,
-                     int count)
-{
+                     int count) {
     std::ifstream file(filename, std::ios::binary); // open file in binary mode
     if (!file.is_open()) {
         std::cerr << "Could not open file: " << filename << std::endl;
@@ -88,8 +89,8 @@ bool readMNISTImages(const std::string &filename,
     // Safety check if the file doesn't have enough images
     if (numberOfImages < count) {
         std::cerr << "File contains fewer images (" << numberOfImages
-                  << ") than required (" << count << "). Using only "
-                  << numberOfImages << " images." << std::endl;
+                << ") than required (" << count << "). Using only "
+                << numberOfImages << " images." << std::endl;
         count = numberOfImages;
     }
 
@@ -120,8 +121,7 @@ bool readMNISTImages(const std::string &filename,
  */
 bool readMNISTLabels(const std::string &filename,
                      std::vector<int> &labels,
-                     int count)
-{
+                     int count) {
     std::ifstream file(filename, std::ios::binary); // open file in binary mode
     if (!file.is_open()) {
         std::cerr << "Could not open file: " << filename << std::endl;
@@ -140,8 +140,8 @@ bool readMNISTLabels(const std::string &filename,
     // Safety check if the file doesn't have enough labels
     if (numberOfLabels < count) {
         std::cerr << "File contains fewer labels (" << numberOfLabels
-                  << ") than required (" << count << "). Using only "
-                  << numberOfLabels << " labels." << std::endl;
+                << ") than required (" << count << "). Using only "
+                << numberOfLabels << " labels." << std::endl;
         count = numberOfLabels;
     }
 
@@ -181,8 +181,8 @@ inline float scaledTanh(float x) {
 inline float scaledTanhDerivative(float x) {
     const float alpha = 1.7159f;
     const float beta = 2.0f / 3.0f;
-    float th = std::tanh(beta * x);   // tanh((2/3)*x)
-    float sech2 = 1.0f - th * th;     // sech^2(z) = 1 - tanh^2(z)
+    float th = std::tanh(beta * x); // tanh((2/3)*x)
+    float sech2 = 1.0f - th * th; // sech^2(z) = 1 - tanh^2(z)
     return alpha * beta * sech2;
 }
 
@@ -265,10 +265,10 @@ public:
         for (int j = 0; j < HIDDEN1; ++j) {
             float sum = b1[j]; // start with bias
             for (int i = 0; i < INPUT_SIZE; ++i) {
-                sum += x[i] * W1[i][j];  // weighted sum of inputs
+                sum += x[i] * W1[i][j]; // weighted sum of inputs
             }
-            z1[j] = sum;                // pre-activation value
-            a1[j] = scaledTanh(sum);    // apply scaled tanh activation
+            z1[j] = sum; // pre-activation value
+            a1[j] = scaledTanh(sum); // apply scaled tanh activation
         }
 
         // 2) Hidden1 -> Hidden2
@@ -280,18 +280,18 @@ public:
                 sum += a1[i] * W2[i][j]; // weighted sum of hidden1 activations
             }
             z2[j] = sum;
-            a2[j] = scaledTanh(sum);    // activation for layer2
+            a2[j] = scaledTanh(sum); // activation for layer2
         }
 
         // 3) Hidden2 -> Output (logits)
         z3.resize(NUM_CLASSES);
-        a3.resize(NUM_CLASSES);         // final output probabilities (after softmax)
+        a3.resize(NUM_CLASSES); // final output probabilities (after softmax)
         for (int j = 0; j < NUM_CLASSES; ++j) {
-            float sum = b3[j];          // bias
+            float sum = b3[j]; // bias
             for (int i = 0; i < HIDDEN2; ++i) {
                 sum += a2[i] * W3[i][j]; // weighted sum of hidden2 activations
             }
-            z3[j] = sum;                // pre-softmax value
+            z3[j] = sum; // pre-softmax value
         }
 
         // Apply softmax to get probabilities for each class
@@ -322,7 +322,7 @@ public:
         std::vector<float> delta3(NUM_CLASSES);
         for (int j = 0; j < NUM_CLASSES; ++j) {
             float target = (j == label) ? 1.0f : 0.0f; // One-hot target
-            delta3[j] = a3[j] - target;                // derivative of cross-entropy + softmax
+            delta3[j] = a3[j] - target; // derivative of cross-entropy + softmax
         }
 
         // 2) Update Hidden2->Output weights/bias
@@ -420,15 +420,15 @@ int main(int argc, char **argv) {
     // Basic argument check: we need 4 file paths
     if (argc < 5) {
         std::cerr << "Usage: " << argv[0]
-                  << " <train_images> <train_labels> <test_images> <test_labels>\n";
+                << " <train_images> <train_labels> <test_images> <test_labels>\n";
         return 1;
     }
 
     // Parse command-line arguments for file paths
     std::string trainImagePath = argv[1];
     std::string trainLabelPath = argv[2];
-    std::string testImagePath  = argv[3];
-    std::string testLabelPath  = argv[4];
+    std::string testImagePath = argv[3];
+    std::string testLabelPath = argv[4];
 
     // Seed the random generator for weight initialization (fixed for reproducibility)
     std::srand(123);
@@ -437,8 +437,7 @@ int main(int argc, char **argv) {
     std::vector<std::vector<float> > trainImages;
     std::vector<int> trainLabels;
     if (!readMNISTImages(trainImagePath, trainImages, TRAINING_SAMPLES) ||
-        !readMNISTLabels(trainLabelPath, trainLabels, TRAINING_SAMPLES))
-    {
+        !readMNISTLabels(trainLabelPath, trainLabels, TRAINING_SAMPLES)) {
         std::cerr << "Error reading training data.\n";
         return 1;
     }
@@ -447,8 +446,7 @@ int main(int argc, char **argv) {
     std::vector<std::vector<float> > testImages;
     std::vector<int> testLabels;
     if (!readMNISTImages(testImagePath, testImages, TEST_SAMPLES) ||
-        !readMNISTLabels(testLabelPath, testLabels, TEST_SAMPLES))
-    {
+        !readMNISTLabels(testLabelPath, testLabels, TEST_SAMPLES)) {
         std::cerr << "Error reading test data.\n";
         return 1;
     }
@@ -458,11 +456,11 @@ int main(int argc, char **argv) {
 
     // Training loop for the specified number of epochs
     for (int epoch = 0; epoch < EPOCHS; ++epoch) {
-        // (Optional) Shuffle training data each epoch for better generalization
-        // Here, it is skipped for brevity.
+        // Start timing this epoch
+        auto epochStart = std::chrono::high_resolution_clock::now();
 
-        float epochLoss = 0.0f;   // We'll track an approximate "loss"
-        int correctCount = 0;     // Track how many training samples are classified correctly
+        float epochLoss = 0.0f; // We'll track an approximate "loss"
+        int correctCount = 0; // Track how many training samples are classified correctly
 
         // Train on each sample
         for (int i = 0; i < TRAINING_SAMPLES; ++i) {
@@ -484,14 +482,17 @@ int main(int argc, char **argv) {
             epochLoss += (pred == trainLabels[i]) ? 0.0f : 1.0f;
         }
 
+        // End timing for this epoch
+        auto epochEnd = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double> epochDuration = epochEnd - epochStart;
+
         // Compute training accuracy
         float trainAccuracy = (100.0f * correctCount) / TRAINING_SAMPLES;
-        std::cout << "Epoch " << (epoch + 1)
-                  << " - Training Accuracy: " << trainAccuracy
-                  << "%, Loss (not real CE): " << epochLoss
-                  << std::endl;
+
 
         // Evaluate on the test set each epoch
+        // Start timing test set evaluation
+        auto testStart = std::chrono::high_resolution_clock::now();
         int testCorrect = 0;
         for (int i = 0; i < TEST_SAMPLES; ++i) {
             int pred = dnn.predict(testImages[i]);
@@ -499,8 +500,22 @@ int main(int argc, char **argv) {
                 testCorrect++;
             }
         }
+
+        // End timing test set evaluation
+        auto testEnd = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double> testDuration = testEnd - testStart;
+
         float testAccuracy = (100.0f * testCorrect) / TEST_SAMPLES;
-        std::cout << "         Test Accuracy: " << testAccuracy << "%\n";
+
+        // Print results with timing information and loss
+        std::cout << "Epoch " << std::setw(2) << (epoch + 1)
+                << " - Training Accuracy: " << std::fixed << std::setprecision(4)
+                << trainAccuracy << "%, Loss: " << epochLoss
+                << " (time: " << std::setprecision(2) << epochDuration.count() << "s)"
+                << "\n         Test Accuracy: " << std::fixed << std::setprecision(2)
+                << testAccuracy << "%"
+                << " (time: " << std::setprecision(2) << testDuration.count() << "s)"
+                << std::endl;
     }
 
     return 0;
